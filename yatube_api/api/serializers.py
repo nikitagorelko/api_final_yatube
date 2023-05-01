@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from django.http import HttpResponseBadRequest
 
 from posts.models import Comment, Group, Post, Follow
 
@@ -57,8 +56,3 @@ class FollowSerializer(serializers.ModelSerializer):
                 fields=('user', 'following')
             )
         ]
-
-        def validate(self, data):
-            if data['user'] == data['following']:
-                return HttpResponseBadRequest
-            return data

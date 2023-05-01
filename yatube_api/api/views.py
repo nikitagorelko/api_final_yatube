@@ -1,13 +1,12 @@
 from django.db.models.query import QuerySet
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponseBadRequest
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.serializers import ModelSerializer
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.filters import SearchFilter
-
+from rest_framework import serializers
 
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers import CommentSerializer, GroupSerializer, PostSerializer, FollowSerializer
@@ -58,4 +57,6 @@ class FollowViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer: ModelSerializer) -> None:
         following = get_object_or_404(User, username=self.request.data.get('following'))
+        if self.request.user == following:
+            raise serializers.ValidationError
         serializer.save(user=self.request.user, following=following)
