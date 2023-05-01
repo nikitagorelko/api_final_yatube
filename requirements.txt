@@ -17,8 +17,6 @@ djangorestframework==3.12.4
 djangorestframework-simplejwt==4.7.2
 djoser==2.1.0
 flake8==6.0.0
-flake8-annotations==3.0.0
-flake8-commas==2.1.0
 idna==3.4
 iniconfig==2.0.0
 isort==5.12.0
