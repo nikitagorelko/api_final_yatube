@@ -1,6 +1,10 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
+from django.http import HttpResponseBadRequest
 
 from posts.models import Comment, Group, Post, Follow
+
+User = get_user_model()
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -34,9 +38,27 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class FollowSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
-    following = serializers.PrimaryKeyRelatedField(read_only=True)
+    user = serializers.SlugRelatedField(
+        queryset=User.objects.all(),
+        slug_field='username',
+        default=serializers.CurrentUserDefault(),
+    )
+    following = serializers.SlugRelatedField(
+        queryset=User.objects.all(),
+        slug_field='username',
+    )
 
     class Meta:
         model = Follow
         fields = '__all__'
+        validators = [
+            serializers.UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=('user', 'following')
+            )
+        ]
+
+        def validate(self, data):
+            if data['user'] == data['following']:
+                return HttpResponseBadRequest
+            return data
