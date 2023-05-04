@@ -11,4 +11,5 @@ class IsAuthorOrReadOnly(BasePermission):
         unused: ViewSet,
         obj: Model,
     ) -> bool:
+        del unused
         return request.method in SAFE_METHODS or obj.author == request.user

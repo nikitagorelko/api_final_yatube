@@ -10,6 +10,7 @@ class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ('id', 'title', 'slug', 'description')
+        read_only_fields = fields
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -17,7 +18,6 @@ class PostSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='username',
     )
-    group = GroupSerializer
 
     class Meta:
         model = Post
