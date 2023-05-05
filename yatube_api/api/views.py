@@ -79,6 +79,4 @@ class FollowViewSet(CreateListDestroyViewSet):
             User,
             username=self.request.data.get('following'),
         )
-        if self.request.user == following:
-            raise serializers.ValidationError
         serializer.save(user=self.request.user, following=following)

@@ -8,8 +8,8 @@ class IsAuthorOrReadOnly(BasePermission):
     def has_object_permission(
         self,
         request: HttpRequest,
-        unused: ViewSet,
+        view: ViewSet,
         obj: Model,
     ) -> bool:
-        del unused
+        del view
         return request.method in SAFE_METHODS or obj.author == request.user
