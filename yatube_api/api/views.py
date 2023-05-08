@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404
+from django.utils.functional import cached_property
 from rest_framework import serializers, viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.mixins import (
@@ -54,14 +55,15 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = (IsAuthorOrReadOnly, IsAuthenticatedOrReadOnly)
 
-    def get_post(self) -> Post:
+    @cached_property
+    def _post(self) -> Post:
         return get_object_or_404(Post, pk=self.kwargs.get('post_id'))
 
     def get_queryset(self) -> QuerySet:
-        return self.get_post().comments.all()
+        return self._post.comments.all()
 
     def perform_create(self, serializer: serializers.ModelSerializer) -> None:
-        serializer.save(author=self.request.user, post=self.get_post())
+        serializer.save(author=self.request.user, post=self._post)
 
 
 class FollowViewSet(CreateListDestroyViewSet):
@@ -73,10 +75,3 @@ class FollowViewSet(CreateListDestroyViewSet):
     def get_queryset(self) -> QuerySet:
         user = get_object_or_404(User, pk=self.request.user.pk)
         return user.user
-
-    def perform_create(self, serializer: serializers.ModelSerializer) -> None:
-        following = get_object_or_404(
-            User,
-            username=self.request.data.get('following'),
-        )
-        serializer.save(user=self.request.user, following=following)
